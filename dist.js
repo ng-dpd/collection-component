@@ -3,7 +3,7 @@ var fs = require('fs'),
     template, oneLinedTemplate, directive;
 
 template = fs.readFileSync(path.resolve('src/collection-component.html'));
-oneLinedTemplate = template.toString().split(/\s*\n\s*/).join('');
+oneLinedTemplate = template.toString().split(/\s*\n\s*/).join('').replace(/([\w\s\:])'/g, '$1\\\'');
 
 directive = fs.readFileSync(path.resolve('src/collection-component.js')).toString();
 directive = directive.replace(
