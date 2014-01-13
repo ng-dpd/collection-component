@@ -92,7 +92,7 @@ describe('dpdCollection', function () {
 
 
     it('should set collectionPath on scope when passed an array literal', function () {
-      $httpBackend.expectGET('/myCollection').respond(200);
+      $httpBackend.expectGET('/myCollection').respond([]);
       var compiled = $compile(
           '<dpd-collection ' +
           'collection-path="'+
@@ -107,7 +107,7 @@ describe('dpdCollection', function () {
 
 
     it('should accept a collectionQuery and attach it to the scope', function () {
-      $httpBackend.expectGET('/myCollection?user=foo').respond(200);
+      $httpBackend.expectGET('/myCollection?user=foo').respond([]);
       var compiled = $compile(
           '<dpd-collection ' +
           'collection-path="'+
@@ -148,10 +148,17 @@ describe('dpdCollection', function () {
 
   describe('CollectionComponentCtrl', function () {
     describe('.query()', function () {
+      var dummyCollection;
+
+      beforeEach(function () {
+        dummyCollection = dpdCollectionStore.collectionCache.foo = [{bar: 'baz'}];
+      });
+
+
       it('should request the collection once `collectionPath` is set', function () {
         var scope = $rootScope.$new();
         var controller = $controller('CollectionComponentCtrl', {$scope: scope});
-        $httpBackend.expectGET('/myCollection').respond(200);
+        $httpBackend.expectGET('/myCollection').respond([]);
         scope.collectionPath = '/myCollection';
         controller.query();
         $httpBackend.flush();
@@ -176,11 +183,26 @@ describe('dpdCollection', function () {
       it('should make the request with a query if provided on the scope', function () {
         var scope = $rootScope.$new();
         var controller = $controller('CollectionComponentCtrl', {$scope: scope});
-        $httpBackend.whenGET('/myCollection?user=foobar').respond(200);
+        $httpBackend.whenGET('/myCollection?user=foobar').respond(dummyCollection);
         scope.collectionPath = '/myCollection';
         scope.collectionQuery = {user: 'foobar'};
         controller.query();
         $httpBackend.flush();
+      });
+
+
+      it('should set the collection in the dpdCollectionStore service', function () {
+        var scope = $rootScope.$new();
+        var spy = spyOn(dpdCollectionStore, 'set');
+
+
+        var controller = $controller('CollectionComponentCtrl', {$scope: scope});
+        $httpBackend.whenGET('/myCollection').respond(dummyCollection);
+        scope.collectionPath = '/myCollection';
+        controller.query();
+        $httpBackend.flush();
+
+        expect(spy).toHaveBeenCalledWith('/myCollection', dummyCollection)
       });
     });
   });

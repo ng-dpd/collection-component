@@ -3,7 +3,7 @@ angular.module('dpdCollection', []).
     this.collectionCache = {};
 
     this.get = function (path) {
-      path = sanitizePath(path);
+      path = this.sanitizePath(path);
       return this.collectionCache[path];
     };
 
@@ -12,18 +12,20 @@ angular.module('dpdCollection', []).
         throw new Error('collection must be an array');
       }
 
-      path = sanitizePath(path);
+      path = this.sanitizePath(path);
       this.collectionCache[path] = collection;
     };
 
-    function sanitizePath (path) {
+    this.sanitizePath = function (path) {
       return path.indexOf('/') === 0 ? path.slice(1) : path;
-    }
+    };
   }).
   controller('CollectionComponentCtrl',
-      ['$scope', '$http', function ($scope, $http) {
+      ['$scope', '$http', 'dpdCollectionStore', function ($scope, $http, dpdCollectionStore) {
         this.onGetCollection = function (coll) {
-          $scope.collection = coll;
+          dpdCollectionStore.set($scope.collectionPath, coll);
+          $scope.collection = dpdCollectionStore.get(
+              $scope.collectionPath);
         };
 
         this.onGetCollectionError = function (coll, err) {
