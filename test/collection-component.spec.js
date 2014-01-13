@@ -1,20 +1,57 @@
 describe('dpdCollection', function () {
-  var $compile, $rootScope, $controller, $httpBackend, $filter;
+  var $compile, $rootScope, $controller, $httpBackend, $filter, dpdCollectionStore;
 
   beforeEach(module('dpdCollection', 'collection-component.html'));
 
-  beforeEach(inject(function (_$compile_, _$rootScope_, _$controller_, _$httpBackend_, _$filter_) {
+  beforeEach(inject(function (_$compile_, _$rootScope_, _$controller_, _$httpBackend_, _$filter_, _dpdCollectionStore_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
     $controller = _$controller_;
     $httpBackend = _$httpBackend_;
     $filter = _$filter_;
+    dpdCollectionStore = _dpdCollectionStore_;
   }));
 
 
   afterEach(function () {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
+  });
+
+
+  describe('dpdCollectionStore', function () {
+    describe('.get()', function () {
+      it('should get the cached collection by relative path', function () {
+        var dummyCollection = dpdCollectionStore.collectionCache.foo = [{bar: 'baz'}];
+        expect(dpdCollectionStore.get('foo')).toBe(dummyCollection);
+      });
+
+
+      it('should sanitize paths prepended with /', function () {
+        var dummyCollection = dpdCollectionStore.collectionCache.foo = [{bar: 'baz'}];
+        expect(dpdCollectionStore.get('/foo')).toBe(dummyCollection);
+      });
+    });
+
+
+    describe('.set()', function () {
+      it('should allow setting a collection by path', function () {
+        var dummyCollection = [{bar: 'baz'}];
+        dpdCollectionStore.set('foo', dummyCollection);
+        expect(dpdCollectionStore.get('foo')).toBe(dummyCollection);
+      });
+
+
+      it('should throw if collection is not an array', function () {
+        expect(function () {dpdCollectionStore.set('foo')}).toThrow(new Error('collection must be an array'));
+      });
+    });
+
+    describe('.merge()', function () {
+      it('should allow merging a collection', function () {
+
+      });
+    });
   });
 
 
@@ -84,9 +121,6 @@ describe('dpdCollection', function () {
       expect($rootScope.collectionQuery).toEqual({user: 'foo'});
       $httpBackend.flush();
     });
-
-
-    it('should render the collection objects in rows');
   });
 
 
@@ -109,7 +143,6 @@ describe('dpdCollection', function () {
     it('should return the input if no formatting should be applied', function () {
       expect(readable('simple string')).toBe('simple string');
     })
-
   });
 
 

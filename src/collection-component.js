@@ -1,4 +1,25 @@
 angular.module('dpdCollection', []).
+  service('dpdCollectionStore', function () {
+    this.collectionCache = {};
+
+    this.get = function (path) {
+      path = sanitizePath(path);
+      return this.collectionCache[path];
+    };
+
+    this.set = function (path, collection) {
+      if (!angular.isArray(collection)) {
+        throw new Error('collection must be an array');
+      }
+
+      path = sanitizePath(path);
+      this.collectionCache[path] = collection;
+    };
+
+    function sanitizePath (path) {
+      return path.indexOf('/') === 0 ? path.slice(1) : path;
+    }
+  }).
   controller('CollectionComponentCtrl',
       ['$scope', '$http', function ($scope, $http) {
         this.onGetCollection = function (coll) {
