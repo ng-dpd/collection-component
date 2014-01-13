@@ -5,10 +5,9 @@
     </th>
   </thead>
   <tbody>
-    <tr ng-
     <tr ng-repeat="obj in collection">
       <td ng-repeat="prop in properties">
-        {{obj[prop.key]}}
+        {{obj[prop.key] | readable:prop.type}}
       </td>
     </tr>
   </tbody>

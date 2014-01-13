@@ -1,13 +1,14 @@
 describe('dpdCollection', function () {
-  var $compile, $rootScope, $controller, $httpBackend;
+  var $compile, $rootScope, $controller, $httpBackend, $filter;
 
   beforeEach(module('dpdCollection', 'collection-component.html'));
 
-  beforeEach(inject(function (_$compile_, _$rootScope_, _$controller_, _$httpBackend_) {
+  beforeEach(inject(function (_$compile_, _$rootScope_, _$controller_, _$httpBackend_, _$filter_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
     $controller = _$controller_;
     $httpBackend = _$httpBackend_;
+    $filter = _$filter_;
   }));
 
 
@@ -18,9 +19,10 @@ describe('dpdCollection', function () {
 
 
   describe('collectionComponent', function () {
-    it('should show loading row before data is fetched', function () {
-
-    });
+    it('should show loading row before data is fetched');
+    it('should allow auto updating of rows');
+    it('should support readonly');
+    it('should have a form in the last row for creating new objects');
 
 
     it('should set properties on the scope from a passed-in array literal', function () {
@@ -65,6 +67,32 @@ describe('dpdCollection', function () {
       expect($rootScope.collectionPath).toBe('/myCollection');
       $httpBackend.flush();
     });
+
+
+    it('should render the collection objects in rows');
+  });
+
+
+  describe('readable', function () {
+    var readable;
+    beforeEach(function () {
+      readable = $filter('readable');
+    });
+
+    it('should format a date object using built-in date filter', function () {
+      expect(readable('1389245177768', 'datetime')).toBe('2014-01-08 9:26 PM');
+    });
+
+
+    it('should filter objects with an ellipsis', function () {
+      expect(readable({foo: 'bar'})).toBe('...');
+    });
+
+
+    it('should return the input if no formatting should be applied', function () {
+      expect(readable('simple string')).toBe('simple string');
+    })
+
   });
 
 
@@ -78,10 +106,21 @@ describe('dpdCollection', function () {
         controller.query();
         $httpBackend.flush();
       });
+
+
+      it('should set the response to `scope.collection`', function () {
+        var scope = $rootScope.$new();
+        var collection = [{
+          foo: 'bar'
+        }];
+        var controller = $controller('CollectionComponentCtrl', {$scope: scope});
+        $httpBackend.whenGET('/myCollection').respond(collection);
+        scope.collectionPath = '/myCollection';
+        controller.query();
+        $httpBackend.flush();
+
+        expect(scope.collection).toEqual(collection);
+      });
     });
-
   });
-
-
-  it('should allow auto updating of rows');
 });
