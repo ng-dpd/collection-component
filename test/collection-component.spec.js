@@ -69,6 +69,23 @@ describe('dpdCollection', function () {
     });
 
 
+    it('should accept a collectionQuery and attach it to the scope', function () {
+      $httpBackend.expectGET('/myCollection?user=foo').respond(200);
+      var compiled = $compile(
+          '<dpd-collection ' +
+          'collection-path="'+
+          '\'/myCollection\''+
+          '" collection-query="'+
+          '{user: \'foo\'}'+
+          '"></dpd-collection>'
+          )($rootScope);
+      $rootScope.$digest();
+
+      expect($rootScope.collectionQuery).toEqual({user: 'foo'});
+      $httpBackend.flush();
+    });
+
+
     it('should render the collection objects in rows');
   });
 
@@ -120,6 +137,17 @@ describe('dpdCollection', function () {
         $httpBackend.flush();
 
         expect(scope.collection).toEqual(collection);
+      });
+
+
+      it('should make the request with a query if provided on the scope', function () {
+        var scope = $rootScope.$new();
+        var controller = $controller('CollectionComponentCtrl', {$scope: scope});
+        $httpBackend.whenGET('/myCollection?user=foobar').respond(200);
+        scope.collectionPath = '/myCollection';
+        scope.collectionQuery = {user: 'foobar'};
+        controller.query();
+        $httpBackend.flush();
       });
     });
   });

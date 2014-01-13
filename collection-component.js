@@ -11,7 +11,11 @@ angular.module('dpdCollection', []).
 
         this.query = function () {
           if ($scope.collectionPath) {
-            $http.get($scope.collectionPath).
+            $http({
+              method: 'GET',
+              url: $scope.collectionPath,
+              params: $scope.collectionQuery
+            }).
             success(this.onGetCollection).
             error(this.onGetCollectionError);
           }
@@ -45,6 +49,7 @@ angular.module('dpdCollection', []).
       link: function (scope, element, attrs, ctrl) {
         scope.properties = $parse(attrs.collectionProperties)(scope);
         scope.collectionPath = $parse(attrs.collectionPath)(scope);
+        scope.collectionQuery = $parse(attrs.collectionQuery)(scope);
 
         ctrl.query();
       }
