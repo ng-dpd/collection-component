@@ -73,7 +73,7 @@ angular.module('dpdCollection', []).
         }
       }
 
-      switch (exp) {
+      switch ((exp && exp.type) || exp) {
         case 'datetime':
           return $filter('date')(arr, 'yyyy-MM-dd h:mm a');
           break;
