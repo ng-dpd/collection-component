@@ -57,13 +57,22 @@ angular.module('dpdCollection', []).
   }]).
   filter('readable', ['$filter', function ($filter) {
     return function (arr, exp) {
+
       if (arr && exp && exp.path) {
         if (typeof arr !== 'object') {
-          arr = JSON.parse(arr);
+          try {
+            var parsed = JSON.parse(arr);
+            return parsed[exp.path]
+          }
+          catch (e) {
+            //continuing
+          }
         }
-
-        return arr[exp.path];
+        else {
+          return arr[exp.path];
+        }
       }
+
       switch (exp) {
         case 'datetime':
           return $filter('date')(arr, 'yyyy-MM-dd h:mm a');
