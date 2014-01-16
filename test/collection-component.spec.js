@@ -107,7 +107,7 @@ describe('dpdCollection', function () {
 
 
     it('should accept a collectionQuery and attach it to the scope', function () {
-      $httpBackend.expectGET('/myCollection?user=foo').respond([]);
+      $httpBackend.expectGET('/myCollection?%7B%22user%22:%22foo%22%7D').respond([]);
       var compiled = $compile(
           '<dpd-collection ' +
           'collection-path="'+
@@ -183,7 +183,7 @@ describe('dpdCollection', function () {
       it('should make the request with a query if provided on the scope', function () {
         var scope = $rootScope.$new();
         var controller = $controller('CollectionComponentCtrl', {$scope: scope});
-        $httpBackend.whenGET('/myCollection?user=foobar').respond(dummyCollection);
+        $httpBackend.whenGET('/myCollection?%7B%22user%22:%22foobar%22%7D').respond(dummyCollection);
         scope.collectionPath = '/myCollection';
         scope.collectionQuery = {user: 'foobar'};
         controller.query();

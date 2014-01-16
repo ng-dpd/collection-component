@@ -34,10 +34,12 @@ angular.module('dpdCollection', []).
 
         this.query = function () {
           if ($scope.collectionPath) {
+            var params = $scope.collectionQuery?
+              '?' + encodeURI(JSON.stringify($scope.collectionQuery)) :
+              '';
             $http({
               method: 'GET',
-              url: $scope.collectionPath,
-              params: $scope.collectionQuery
+              url: $scope.collectionPath + params
             }).
             success(this.onGetCollection).
             error(this.onGetCollectionError);
