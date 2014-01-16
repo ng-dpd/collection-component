@@ -45,9 +45,25 @@ angular.module('dpdCollection', []).
             error(this.onGetCollectionError);
           }
         };
+
+        this.getReadable = function (prop) {
+          if (prop.path) {
+            return {path: prop.path}
+          }
+          else {
+            return prop;
+          }
+        }
   }]).
   filter('readable', ['$filter', function ($filter) {
     return function (arr, exp) {
+      if (arr && exp && exp.path) {
+        if (typeof arr !== 'object') {
+          arr = JSON.parse(arr);
+        }
+
+        return arr[exp.path];
+      }
       switch (exp) {
         case 'datetime':
           return $filter('date')(arr, 'yyyy-MM-dd h:mm a');

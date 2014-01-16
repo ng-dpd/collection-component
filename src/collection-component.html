@@ -7,7 +7,7 @@
   <tbody>
     <tr ng-repeat="obj in collection">
       <td ng-repeat="prop in properties">
-        {{obj[prop.key] | readable:prop.type}}
+        {{obj[prop.key] | readable:collectionCtrl.getReadable(prop)}}
       </td>
     </tr>
   </tbody>

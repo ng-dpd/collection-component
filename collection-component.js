@@ -45,9 +45,25 @@ angular.module('dpdCollection', []).
             error(this.onGetCollectionError);
           }
         };
+
+        this.getReadable = function (prop) {
+          if (prop.path) {
+            return {path: prop.path}
+          }
+          else {
+            return prop;
+          }
+        }
   }]).
   filter('readable', ['$filter', function ($filter) {
     return function (arr, exp) {
+      if (arr && exp && exp.path) {
+        if (typeof arr !== 'object') {
+          arr = JSON.parse(arr);
+        }
+
+        return arr[exp.path];
+      }
       switch (exp) {
         case 'datetime':
           return $filter('date')(arr, 'yyyy-MM-dd h:mm a');
@@ -68,7 +84,7 @@ angular.module('dpdCollection', []).
   directive('dpdCollection', ['$parse', function ($parse) {
     return {
       restrict: 'E',
-      template: '<table class="table table-hover"><thead><th ng-repeat="prop in properties">{{prop.readable}}</th></thead><tbody><tr ng-repeat="obj in collection"><td ng-repeat="prop in properties">{{obj[prop.key] | readable:prop.type}}</td></tr></tbody></table>',
+      template: '<table class="table table-hover"><thead><th ng-repeat="prop in properties">{{prop.readable}}</th></thead><tbody><tr ng-repeat="obj in collection"><td ng-repeat="prop in properties">{{obj[prop.key] | readable:collectionCtrl.getReadable(prop)}}</td></tr></tbody></table>',
       controller: 'CollectionComponentCtrl',
       controllerAs: 'collectionCtrl',
       link: function (scope, element, attrs, ctrl) {

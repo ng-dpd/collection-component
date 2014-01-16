@@ -121,6 +121,21 @@ describe('dpdCollection', function () {
       expect($rootScope.collectionQuery).toEqual({user: 'foo'});
       $httpBackend.flush();
     });
+
+
+    it('should show a specified key in an object type property value', function () {
+      $httpBackend.expectGET('/myCollection').respond([{foo: {name: 'fooname'}}]);
+      $rootScope.props = [{key:'foo', readable: 'foo readable', path: 'name'}];
+      var compiled = $compile(
+        '<dpd-collection collection-path="\'/myCollection\'"'+
+        'collection-properties="props"' +
+        '>'+
+        '</dpd-collection>')($rootScope);
+      $rootScope.$apply();
+      $httpBackend.flush();
+
+      expect(compiled.text()).toMatch(/.*\s+fooname\s.*/);
+    })
   });
 
 
@@ -131,7 +146,7 @@ describe('dpdCollection', function () {
     });
 
     it('should format a date object using built-in date filter', function () {
-      expect(readable('1389245177768', 'datetime')).toBe('2014-01-08 9:26 PM');
+      expect(readable('1389245177768', 'datetime')).toBe('2014-01-08 10:26 PM');
     });
 
 
@@ -142,7 +157,11 @@ describe('dpdCollection', function () {
 
     it('should return the input if no formatting should be applied', function () {
       expect(readable('simple string')).toBe('simple string');
-    })
+    });
+
+    it('should return a deep path if the exp is an object', function () {
+      expect(readable('{"foo":"bar"}',{path: 'foo'})).toBe('bar');
+    });
   });
 
 
@@ -194,7 +213,6 @@ describe('dpdCollection', function () {
       it('should set the collection in the dpdCollectionStore service', function () {
         var scope = $rootScope.$new();
         var spy = spyOn(dpdCollectionStore, 'set');
-
 
         var controller = $controller('CollectionComponentCtrl', {$scope: scope});
         $httpBackend.whenGET('/myCollection').respond(dummyCollection);
